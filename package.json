@@ -140,7 +140,7 @@
     "cpx": "^1.5.0",
     "cross-env": "^6.0.3"
   },
-  
+
   "files": [
     "esm",
     "lib"
@@ -151,6 +151,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AAA/BBB.git"
+    "url": "git@github.com:baoyule-js/bylui.git"
   }
 }
