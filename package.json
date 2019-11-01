@@ -1,8 +1,9 @@
 {
   "name": "bylui",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "private": false,
   "dependencies": {
+    "@babel/plugin-transform-duplicate-keys": "^7.5.0",
     "@svgr/webpack": "4.3.2",
     "@typescript-eslint/eslint-plugin": "^2.2.0",
     "@typescript-eslint/parser": "^2.2.0",
@@ -130,7 +131,6 @@
       "jest-watch-typeahead/testname"
     ]
   },
-
   "devDependencies": {
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.0",
@@ -140,7 +140,6 @@
     "cpx": "^1.5.0",
     "cross-env": "^6.0.3"
   },
-
   "files": [
     "esm",
     "lib"
