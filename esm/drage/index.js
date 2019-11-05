@@ -8,7 +8,6 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 import React, { Component } from 'react';
 import styles from './index.module.css';
-console.log(styles);
 
 var Draggable =
 /*#__PURE__*/
@@ -22,6 +21,13 @@ function (_Component) {
     _this.state = {
       uId: _this.guid()
     };
+    _this.items = props.value.map(function (each, index) {
+      return {
+        sortKey: index + 1,
+        codeKey: index + 1,
+        node: each
+      };
+    });
     return _this;
   }
 
@@ -37,7 +43,6 @@ function (_Component) {
   ;
 
   _proto.domdrugstart = function domdrugstart(sort, code, uId, item, ee) {
-    console.log('ee', ee);
     ee.dataTransfer.setData("sort", sort);
     ee.dataTransfer.setData("code", code);
     ee.dataTransfer.setData("uId", uId);
@@ -46,8 +51,6 @@ function (_Component) {
   ;
 
   _proto.dragenter = function dragenter(ee) {
-    console.log('dragenter');
-
     if (ee.target.className.indexOf('droppedcontent') !== -1) {
       ee.target.className = styles.droppingContent;
     }
@@ -55,8 +58,6 @@ function (_Component) {
   ;
 
   _proto.dragleave = function dragleave(ee) {
-    console.log('drageleave');
-
     if (ee.target.className.indexOf('droppingContent') !== -1) {
       ee.target.className = styles.droppedcontent;
     }
@@ -77,7 +78,6 @@ function (_Component) {
   ;
 
   _proto.drop = function drop(dropedSort, data, sortKey, dropedUid, codeKey, ee) {
-    console.log('释放的时候', dropedSort, data, sortKey, dropedUid, codeKey);
     ee.preventDefault();
     var code = parseInt(ee.dataTransfer.getData("code"));
     var uId = ee.dataTransfer.getData("uId");
@@ -94,7 +94,7 @@ function (_Component) {
           }
 
           return item;
-        }); // ee.target.before(document.getElementById(code))
+        });
       } else {
         data.map(function (item) {
           if (item[codeKey] === code) {
@@ -104,14 +104,8 @@ function (_Component) {
           }
 
           return item;
-        }); // ee.target.after(document.getElementById(code))
+        });
       }
-
-      console.log(data);
-    }
-
-    if (this.props.onChange) {
-      this.props.onChange(data);
     }
 
     this.setState({
@@ -120,6 +114,14 @@ function (_Component) {
 
     if (ee.target.className.indexOf('droppingContent') !== -1) {
       ee.target.className = styles.droppedcontent;
+    }
+
+    var arr = data.sort(this.compare('sortKey'));
+
+    if (this.props.onChange) {
+      this.props.onChange(arr.map(function (each) {
+        return each.codeKey;
+      }));
     }
   };
 
@@ -135,9 +137,7 @@ function (_Component) {
   _proto.createDraggleComponent = function createDraggleComponent(data, sortKey, style, uId, render, codeKey) {
     var _this2 = this;
 
-    var arr = data.sort(this.compare(sortKey));
-    console.log(arr);
-    return arr.map(function (item) {
+    return data.map(function (item) {
       return React.createElement("div", {
         className: styles.droppedcontent,
         key: item[codeKey],
@@ -154,9 +154,6 @@ function (_Component) {
 
   _proto.render = function render() {
     var _this$props = this.props,
-        value = _this$props.value,
-        sortKey = _this$props.sortKey,
-        codeKey = _this$props.codeKey,
         style = _this$props.style,
         render = _this$props.render;
     var uId = this.state.uId;
@@ -166,7 +163,7 @@ function (_Component) {
         flexDirection: 'row',
         flexWrap: 'wrap'
       }
-    }, this.createDraggleComponent(value, sortKey, style, uId, render, codeKey)));
+    }, this.createDraggleComponent(this.items, 'sortKey', style, uId, render, 'codeKey')));
   };
 
   return Draggable;

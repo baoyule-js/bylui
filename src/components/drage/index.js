@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
-import styles from './index.module.css'
-console.log(styles)
+import styles from './index.module.css';
 export default class Draggable extends Component {
     constructor(props) {
         super(props);
         this.state = {
             uId: this.guid()
-        }
+        };
+        this.items = props.value.map((each,index)=>{
+            return{
+                sortKey:index+1,
+                codeKey:index+1,
+                node:each
+            }
+        })
     }
-
     S4() {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     }
@@ -17,23 +22,19 @@ export default class Draggable extends Component {
     }
     // 拖动事件
     domdrugstart(sort, code, uId, item, ee) {
-        console.log('ee',ee);
         ee.dataTransfer.setData("sort", sort);
         ee.dataTransfer.setData("code", code);
         ee.dataTransfer.setData("uId", uId);
-        ee.dataTransfer.setData("item", item);
-        
+        ee.dataTransfer.setData("item", item);    
     }
     // 拖动后鼠标进入另一个可接受区域
     dragenter(ee) {
-        console.log('dragenter')
         if (ee.target.className.indexOf('droppedcontent') !== -1) {
             ee.target.className = styles.droppingContent;
         }
     }
     // a拖到b，离开b的时候触发
     dragleave(ee) {
-        console.log('drageleave')
         if (ee.target.className.indexOf('droppingContent') !== -1) {
             ee.target.className = styles.droppedcontent;
         }
@@ -51,7 +52,6 @@ export default class Draggable extends Component {
     }
     // 当一个元素或是选中的文字被拖拽释放到一个有效的释放目标位置时
     drop(dropedSort, data, sortKey, dropedUid, codeKey, ee) {
-        console.log('释放的时候', dropedSort, data, sortKey, dropedUid, codeKey)
         ee.preventDefault();
         const code = parseInt(ee.dataTransfer.getData("code"));
         const uId = ee.dataTransfer.getData("uId");
@@ -67,7 +67,6 @@ export default class Draggable extends Component {
                     }
                     return item;
                 });
-                // ee.target.before(document.getElementById(code))
             } else {
                 data.map(item => {
                     if (item[codeKey] === code) {
@@ -77,16 +76,17 @@ export default class Draggable extends Component {
                     }
                     return item;
                 });
-                // ee.target.after(document.getElementById(code))
             }
-            console.log(data);
-        }
-        if(this.props.onChange){
-            this.props.onChange(data)
         }
         this.setState({uId: this.guid()});
         if (ee.target.className.indexOf('droppingContent') !== -1) {
             ee.target.className = styles.droppedcontent;
+        }
+        let arr = data.sort(this.compare('sortKey'));
+        if(this.props.onChange){
+            this.props.onChange(arr.map(each=>{
+                return each.codeKey
+            }))
         }
 
     }
@@ -98,10 +98,8 @@ export default class Draggable extends Component {
        
     }
     // 生成拖拽组件
-    createDraggleComponent(data, sortKey, style, uId, render, codeKey ) {
-        let arr = data.sort(this.compare(sortKey));
-        console.log(arr)
-        return arr.map((item) => {
+    createDraggleComponent(data, sortKey, style, uId, render, codeKey ) {   
+        return data.map((item) => {
             return (
                 <div
                     className={styles.droppedcontent}
@@ -116,13 +114,14 @@ export default class Draggable extends Component {
             )
         })
     }
+
     render() {
-        const { value, sortKey, codeKey, style, render } = this.props;
+        const { style, render } = this.props;
         const { uId } = this.state;
         return (
             <div>
                 <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {this.createDraggleComponent(value, sortKey, style, uId, render, codeKey)}
+                    {this.createDraggleComponent(this.items, 'sortKey', style, uId, render, 'codeKey')}
                 </div>
             </div>
         )
